@@ -546,10 +546,19 @@ function ContactForm() {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setStatus("sending");
-    await new Promise((r) => setTimeout(r, 1400));
-    setStatus("success");
-    setForm({ nome: "", azienda: "", email: "", telefono: "", messaggio: "" });
-    setErrors({});
+    try {
+      const res = await fetch("https://formspree.io/f/mgorqden", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("Errore");
+      setStatus("success");
+      setForm({ nome: "", azienda: "", email: "", telefono: "", messaggio: "" });
+      setErrors({});
+    } catch {
+      setStatus("error");
+    }
   };
 
   const field = (key, placeholder, type = "text", span = false) => (
