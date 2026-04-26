@@ -12,6 +12,8 @@ const pages = [
   ["contatti", "Contatti"],
 ];
 
+// Privacy policy not in nav but accessible via footer
+
 const services = [
   {
     icon: "strategy",
@@ -528,7 +530,7 @@ function CtaBanner({ setPage }) {
 // ─── CONTACT FORM ─────────────────────────────────────────────────────────────────
 
 function ContactForm() {
-  const [form, setForm] = useState({ nome: "", azienda: "", email: "", telefono: "", messaggio: "" });
+  const [form, setForm] = useState({ nome: "", azienda: "", email: "", telefono: "", messaggio: "", privacy: false });
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("idle");
 
@@ -538,6 +540,7 @@ function ContactForm() {
     if (!form.email.trim())    e.email    = "Campo obbligatorio";
     else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = "Email non valida";
     if (!form.messaggio.trim()) e.messaggio = "Raccontaci del tuo progetto";
+    if (!form.privacy)         e.privacy  = "Devi accettare la Privacy Policy per continuare";
     return e;
   };
 
@@ -554,7 +557,7 @@ function ContactForm() {
       });
       if (!res.ok) throw new Error("Errore");
       setStatus("success");
-      setForm({ nome: "", azienda: "", email: "", telefono: "", messaggio: "" });
+      setForm({ nome: "", azienda: "", email: "", telefono: "", messaggio: "", privacy: false });
       setErrors({});
     } catch {
       setStatus("error");
@@ -597,6 +600,24 @@ function ContactForm() {
           />
           {errors.messaggio && <p className="mt-1.5 text-xs text-red-400">{errors.messaggio}</p>}
         </div>
+      </div>
+      <div className="mt-5 md:col-span-2">
+        <label className="flex items-start gap-3 cursor-pointer group">
+          <input
+            type="checkbox"
+            checked={form.privacy}
+            onChange={(ev) => { setForm((f) => ({ ...f, privacy: ev.target.checked })); setErrors((er) => ({ ...er, privacy: "" })); }}
+            className="mt-0.5 h-4 w-4 rounded border-white/20 bg-black/40 accent-cyan-400 cursor-pointer"
+          />
+          <span className="text-sm text-white/60 leading-relaxed">
+            Ho letto e accetto la{" "}
+            <button type="button" onClick={() => window._showPrivacy && window._showPrivacy()} className="text-cyan-400 hover:underline">
+              Privacy Policy
+            </button>
+            {" "}e acconsento al trattamento dei miei dati personali ai sensi del Reg. UE 2016/679 (GDPR). *
+          </span>
+        </label>
+        {errors.privacy && <p className="mt-1.5 text-xs text-red-400">{errors.privacy}</p>}
       </div>
       <div className="mt-6 flex items-center gap-4">
         <Button type="submit" disabled={status === "sending"}>
@@ -854,12 +875,90 @@ function Footer({ setPage }) {
         </div>
       </Container>
       <div className="border-t border-white/10 py-5">
-        <Container className="flex flex-col gap-1 text-xs text-white/30 sm:flex-row sm:justify-between">
-          <span>© {year} CreaXion Agency. Tutti i diritti riservati.</span>
-          <span>P.IVA 18247171004</span>
+        <Container className="flex flex-col gap-2 text-xs text-white/30 sm:flex-row sm:justify-between sm:items-center">
+          <span>© {year} CreaXion Agency di Schweizer Ennio Federico. Tutti i diritti riservati.</span>
+          <div className="flex gap-4">
+            <button onClick={() => setPage("privacy")} className="hover:text-cyan-400 transition-colors">Privacy Policy</button>
+            <span>P.IVA 18247171004</span>
+          </div>
         </Container>
       </div>
     </footer>
+  );
+}
+
+
+// ─── PRIVACY POLICY PAGE ─────────────────────────────────────────────────────────
+
+function PrivacyPage() {
+  return (
+    <Container>
+      <section className="py-20 max-w-3xl">
+        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-400">Informativa</p>
+        <h1 className="text-4xl font-extrabold tracking-tight mb-10">Privacy Policy</h1>
+
+        {[
+          ["1. Titolare del Trattamento", `Creaxion Agency di Schweizer Ennio Federico
+Via Monte di Casa, San Cesareo (RM)
+P.IVA: 18247171004
+Email: info@creaxionagency.it
+Tel: 331 783 9690`],
+          ["2. Dati raccolti", "Tramite il form di contatto raccogliamo: nome, ragione sociale, indirizzo email, numero di telefono e il messaggio inviato dall'utente. Tali dati sono forniti volontariamente dall'utente."],
+          ["3. Finalità del trattamento", "I dati raccolti sono utilizzati esclusivamente per rispondere alle richieste di contatto e per fornire i servizi richiesti. Non vengono utilizzati per finalità di marketing senza esplicito consenso."],
+          ["4. Base giuridica", "Il trattamento si basa sul consenso espresso dell'interessato (Art. 6, par. 1, lett. a GDPR) e sull'esecuzione di misure precontrattuali adottate su richiesta dell'interessato (Art. 6, par. 1, lett. b GDPR)."],
+          ["5. Conservazione dei dati", "I dati personali saranno conservati per il tempo strettamente necessario alle finalità per cui sono stati raccolti e comunque non oltre 24 mesi dall'ultima interazione, salvo obblighi di legge."],
+          ["6. Comunicazione a terzi", "I dati non vengono ceduti a terzi per finalità commerciali. Possono essere condivisi con fornitori di servizi tecnici (es. Formspree per la gestione del form) nel rispetto del GDPR, i quali agiscono come Responsabili del Trattamento."],
+          ["7. Diritti dell'interessato", `In qualità di interessato, hai diritto di:
+• Accedere ai tuoi dati personali
+• Chiederne la rettifica o la cancellazione
+• Opporti al trattamento
+• Richiedere la limitazione del trattamento
+• Presentare reclamo all'autorità di controllo (Garante Privacy - www.garanteprivacy.it)
+
+Per esercitare i tuoi diritti scrivi a: info@creaxionagency.it`],
+          ["8. Cookie", "Questo sito utilizza esclusivamente cookie tecnici necessari al funzionamento (es. Google Fonts per il caricamento dei caratteri tipografici). Non vengono utilizzati cookie di profilazione o tracciamento di terze parti."],
+          ["9. Aggiornamenti", "Questa informativa può essere aggiornata in qualsiasi momento. La versione aggiornata sarà pubblicata su questa pagina con la relativa data di revisione."],
+        ].map(([title, text]) => (
+          <div key={title} className="mb-8 rounded-2xl border border-white/10 bg-white/[0.02] p-7">
+            <h2 className="text-lg font-bold text-cyan-400 mb-3">{title}</h2>
+            <p className="text-white/65 leading-7 whitespace-pre-line">{text}</p>
+          </div>
+        ))}
+
+        <p className="mt-8 text-xs text-white/35">Ultimo aggiornamento: Aprile 2025</p>
+      </section>
+    </Container>
+  );
+}
+
+// ─── COOKIE BANNER ────────────────────────────────────────────────────────────────
+
+function CookieBanner({ onAccept, onShowPrivacy }) {
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 md:p-6">
+      <div className="mx-auto max-w-4xl rounded-2xl border border-white/15 bg-black/90 backdrop-blur-xl p-5 shadow-2xl shadow-black/50">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex-1">
+            <p className="text-sm font-semibold mb-1">🍪 Questo sito usa cookie tecnici</p>
+            <p className="text-xs leading-relaxed text-white/55">
+              Utilizziamo cookie tecnici necessari al funzionamento del sito (es. Google Fonts).
+              Non usiamo cookie di profilazione. Continuando accetti l'uso di questi cookie.{" "}
+              <button onClick={onShowPrivacy} className="text-cyan-400 hover:underline">
+                Leggi la Privacy Policy
+              </button>
+            </p>
+          </div>
+          <div className="flex gap-3 shrink-0">
+            <button
+              onClick={onAccept}
+              className="rounded-full bg-cyan-400 px-5 py-2.5 text-sm font-semibold text-black hover:bg-cyan-300 transition-colors"
+            >
+              Accetta
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -867,15 +966,33 @@ function Footer({ setPage }) {
 
 export default function App() {
   const [page, setPage] = useState("home");
+  const [cookieAccepted, setCookieAccepted] = useState(
+    () => typeof localStorage !== "undefined" && localStorage.getItem("cookie_accepted") === "1"
+  );
 
   const navigate = useCallback((key) => {
     setPage(key);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  const showPrivacy = useCallback(() => {
+    navigate("privacy");
+  }, [navigate]);
+
+  // Expose showPrivacy globally for the form checkbox link
   useEffect(() => {
-    const label = pages.find(([key]) => key === page)?.[1] ?? "Home";
-    document.title = `${label} — CreaXion Agency`;
+    window._showPrivacy = showPrivacy;
+    return () => { delete window._showPrivacy; };
+  }, [showPrivacy]);
+
+  const handleAcceptCookie = useCallback(() => {
+    localStorage.setItem("cookie_accepted", "1");
+    setCookieAccepted(true);
+  }, []);
+
+  useEffect(() => {
+    const titles = { agenzia: "Agenzia", servizi: "Servizi", clienti: "Clienti", progetti: "Progetti", processo: "Processo", contatti: "Contatti", privacy: "Privacy Policy" };
+    document.title = `${titles[page] ?? "Home"} — CreaXion Agency`;
   }, [page]);
 
   const currentPage = useMemo(() => {
@@ -887,6 +1004,7 @@ export default function App() {
       case "progetti": return <ProgettiPage {...props} />;
       case "processo": return <ProcessoPage {...props} />;
       case "contatti": return <ContattiPage />;
+      case "privacy":  return <PrivacyPage />;
       default:         return <HomePage    {...props} />;
     }
   }, [page, navigate]);
@@ -901,6 +1019,9 @@ export default function App() {
       <Header page={page} setPage={navigate} />
       <main className="relative" id="main-content">{currentPage}</main>
       <Footer setPage={navigate} />
+      {!cookieAccepted && (
+        <CookieBanner onAccept={handleAcceptCookie} onShowPrivacy={showPrivacy} />
+      )}
     </div>
   );
 }
